@@ -9,7 +9,10 @@ class DB_INTERACT {
 
     findAllEmployees() {
         console.log('In all employee');
-        const sql = `SELECT * FROM employee`;
+        const sql = `SELECT employee.id, employee.first_name, employee.last_name,
+                    role.title, role.salary, department.name 
+                    FROM employee LEFT JOIN role ON employee.role_id = role.id 
+                    LEFT JOIN department ON role.department_id = department.id`;
         const results = this.db.promise().query(sql).then((rows) => {
             console.table(rows[0]);
         });
@@ -19,25 +22,23 @@ class DB_INTERACT {
         console.log('In all departments');
         const sql = `SELECT * FROM department`;
         const results = this.db.promise().query(sql).then((rows) => {
-            console.table(rows[0]);
+            return rows[0];
         });
         return results;
     }
-    async getAllDepts() {
-        let dept = [];
-        const sql = `SELECT * FROM department`;
-        const results = await this.db.promise().query(sql).then((rows) => {
-            //console.log(rows[0]);
-            rows[0].forEach(row => {
-                dept.push(row.name);
-          })
+     /*getAllDepts() {
+        //running into promise and/or scoping issue with getting array of depts
+        const sql = `SELECT name FROM department`;
+        const results = this.db.promise().query(sql).then((rows) => {
+            return rows[0];
         });
-        //console.log(dept);
-        return dept;
-    }
+        console.log(results);
+        return results;
+    }*/
     findAllRoles() {
         console.log('In all roles');
-        const sql = `SELECT * FROM role`;
+        const sql = `SELECT role.id, role.title, role.salary, department.name FROM role 
+                    LEFT JOIN department ON role.department_id = department.id`;
         const results = this.db.promise().query(sql).then((rows) => {
             console.table(rows[0]);
         });
@@ -53,8 +54,9 @@ class DB_INTERACT {
         return this.db.promise().query(sql, employee);
     }
     createRole(role) {
-        const sql = `INSERT INTO role SET ?`
-        return this.db.promise().query(sql, role);
+        const sql = `INSERT INTO role (title, salary, department_id) VALUES (?,?,?)`
+        const params = [role.roleName, role.salary, role.depts]
+        return this.db.promise().query(sql, params);
     }
     //create function in this class for each db query/update/delete
     //call each query based on main menu of options from inquirer

@@ -20,58 +20,74 @@ const addDepartment = () => {
     ]).then(department => {
         console.log(department.deptName);
         db.createDepartments(department.deptName);
-    })
+    });
 };
 
 const addRole = () => {
     // let deptChoices = db.getAllDepts();
-    console.log(db.getAllDepts());
+    //console.log(db.getAllDepts());
    //console.log(db.getAllDepts());
-    return inquirer.prompt ([
-        {
-            type: 'input',
-            name: 'roleName',
-            message: 'What is the name of the Role you wish to add?',
-            validate: roleName => {
-                if (roleName) {
-                    return true;
-                } else {
-                    console.log('Enter your Role Name!');
-                    return false;
+   let deptsObj;
+   db.findAllDepartments().then(data => {
+        deptsObj = data;
+       return data.map(department => {
+           return department.name
+       });
+   }).then(depts => {
+        return inquirer.prompt ([
+            {
+                type: 'input',
+                name: 'roleName',
+                message: 'What is the name of the Role you wish to add?',
+                validate: roleName => {
+                    if (roleName) {
+                        return true;
+                    } else {
+                        console.log('Enter your Role Name!');
+                        return false;
+                    }
+                }
+            },
+            {
+                type: 'input',
+                name: 'salary',
+                message: 'What is the Salary of the Role?',
+                validate: salary => {
+                    if (salary) {
+                        return true;
+                    } else {
+                        console.log('Enter the Salary!');
+                        return false;
+                    }
+                }
+            },
+            {
+                type: 'list',
+                name: 'depts',
+                message: 'Which Department does this Role belong to?',
+                choices: depts,
+                validate: roleName => {
+                    if (roleName) {
+                        return true;
+                    } else {
+                        console.log('Enter your Role Name!');
+                        return false;
+                    }
                 }
             }
-        },
-        {
-            type: 'input',
-            name: 'salary',
-            message: 'What is the Salary of the Role?',
-            validate: salary => {
-                if (salary) {
-                    return true;
-                } else {
-                    console.log('Enter the Salary!');
-                    return false;
+        ]).then(role => {
+            let a = deptsObj.filter(rows => {
+                if (rows.name === role.depts) {
+                    return rows.id;
                 }
-            }
-        },
-        {
-            type: 'list',
-            name: 'depts',
-            message: 'Which Department des this Role belong to?',
-            choices: db.getAllDepts(),
-            validate: roleName => {
-                if (roleName) {
-                    return true;
-                } else {
-                    console.log('Enter your Role Name!');
-                    return false;
-                }
-            }
-        }
-    ]).then(role => {
-        console.log(role.roleName);
-        //db.createRole(role.roleName);
-    })
+            })
+            console.log(a[0].id)
+            role.depts = a[0].id;
+            console.log(role.roleName+ ' + '+ role.depts+ ' + '+ role.salary);
+            db.createRole(role);
+        });
+   })
+    
 }
 
 const companyPrompts = () => {
@@ -95,24 +111,36 @@ return inquirer.prompt ([
 .then(companyChoice => {
     switch(companyChoice.choice) {
         case 'View All Departments':
-            console.table(db.findAllDepartments());
+            db.findAllDepartments().then(data => {
+                console.table(data);
+                companyPrompts();
+            });
             break;
         case 'View all Roles':
-            console.table(db.findAllRoles());
+            db.findAllRoles().then(data => {
+                console.table(data);
+                companyPrompts();
+            });
             break;
         case 'View all Employees':
-            console.table(db.findAllEmployees());
+            db.findAllEmployees().then(data => {
+                console.table(data);
+                companyPrompts();
+            });
             break;
         case 'Add a Department':
             addDepartment();
             //console.table(db.findAllDepartments());
+            //companyPrompts();
             break;
         case 'Add a Role':
             addRole();
             //console.table(db.findAllRoles());
+            //companyPrompts();
             break;
         case 'Add an Employee':
             //console.table(db.findAllEmployees());
+            companyPrompts();
             break;
         default:
             console.log('DEFAULT:'+ companyChoice.choice);
