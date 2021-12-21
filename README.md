@@ -3,6 +3,7 @@
 
 ## Table of Contents
 * [Description](##description)
+* [Video Link](##video-link)
 * [Screenshot](##screenshot)
 * [Installation Instructions](##installation)
 * [Usage Details](##usage)
@@ -16,6 +17,9 @@
 ## Description
 
 This is a command line application that takes inputs from a user to display db tables of roles, departments, and employees and allows a user to also add a role, department, or employee as well as update an employee's role if they change jobs
+
+## Video Link
+https://watch.screencastify.com/v/CvuQhf0QPxYFSbPOwbDp
 
 ## Installation
 
