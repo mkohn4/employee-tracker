@@ -90,6 +90,116 @@ const addRole = () => {
     
 }
 
+const addEmployee = () => {
+    // let deptChoices = db.getAllDepts();
+    //console.log(db.getAllDepts());
+   //console.log(db.getAllDepts());
+   let rolesObj;
+   let employeesObj;
+   let rolesArr = [];
+   //get all roles
+   db.findAllRoles().then(data => {
+        rolesObj = data;
+       return data.map(role => {
+           return role.title
+       });
+   }).then(roles => {
+       //set roles array equal to array names
+    rolesArr = roles;
+    //find all employees and get first name array
+    db.findAllEmployees().then(data => {
+        employeesObj = data;
+        return data.map(employee => {
+            return employee.first_name
+        });
+    }).then(employeeNames => {
+                return inquirer.prompt ([
+                    {
+                        type: 'input',
+                        name: 'firstName',
+                        message: 'What is the first name of the Employee you wish to add?',
+                        validate: firstName => {
+                            if (firstName) {
+                                return true;
+                            } else {
+                                console.log('Enter a Name!');
+                                return false;
+                            }
+                        }
+                    },
+                    {
+                        type: 'input',
+                        name: 'lastName',
+                        message: 'What is the Last Name of the Employee?',
+                        validate: lastName => {
+                            if (lastName) {
+                                return true;
+                            } else {
+                                console.log('Enter the last name!');
+                                return false;
+                            }
+                        }
+                    },
+                    {
+                        type: 'list',
+                        name: 'role',
+                        message: 'Which Role does this Employee belong to?',
+                        choices: rolesArr,
+                        validate: role => {
+                            if (role) {
+                                return true;
+                            } else {
+                                console.log('Enter a Role!');
+                                return false;
+                            }
+                        }
+                    },
+                    {
+                        type: 'list',
+                        name: 'manager',
+                        message: 'Who Manages this Employee?',
+                        choices: employeeNames,
+                        validate: manager => {
+                            if (manager) {
+                                return true;
+                            } else {
+                                console.log('Choose an Option!');
+                                return false;
+                            }
+                        }
+                    }
+                ]).then(employee => {
+                    console.log(rolesObj);
+                    console.log(employeesObj);
+                    console.log(employee);
+                    //get role id from object
+                    let roleId = rolesObj.filter(rows => {
+                        if (rows.title === employee.role) {
+                            return rows.id;
+                        }
+                    })
+                    //get employee id from object
+                    let employeeId = employeesObj.filter(rows => {
+                        if (rows.first_name === employee.manager) {
+                            return rows.id;
+                        }
+                    })
+                    console.log(roleId[0].id);
+                    //set employee role equal to role identifier in db
+                    employee.role = roleId[0].id;
+                    console.log(employeeId[0].id);
+                    //set employee manager to the defined managers id
+                    employee.manager = employeeId[0].id;
+                    //employee.depts = a[0].id;
+                    console.log(employee.firstName+ ' + '+ employee.lastName+ ' + '+ employee.role+' + '+employee.manager);
+                    db.createEmployee(employee);
+                }).then(companyPrompts);
+            })
+        });
+    }    
+  
+
+
 const companyPrompts = () => {
 
 return inquirer.prompt ([
@@ -139,8 +249,9 @@ return inquirer.prompt ([
             //companyPrompts();
             break;
         case 'Add an Employee':
+            addEmployee();
             //console.table(db.findAllEmployees());
-            companyPrompts();
+            //companyPrompts();
             break;
         default:
             console.log('DEFAULT:'+ companyChoice.choice);

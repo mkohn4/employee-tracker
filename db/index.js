@@ -14,7 +14,7 @@ class DB_INTERACT {
                     FROM employee LEFT JOIN role ON employee.role_id = role.id 
                     LEFT JOIN department ON role.department_id = department.id`;
         const results = this.db.promise().query(sql).then((rows) => {
-            console.table(rows[0]);
+            return rows[0];
         });
         return results;
     }
@@ -40,21 +40,22 @@ class DB_INTERACT {
         const sql = `SELECT role.id, role.title, role.salary, department.name FROM role 
                     LEFT JOIN department ON role.department_id = department.id`;
         const results = this.db.promise().query(sql).then((rows) => {
-            console.table(rows[0]);
+            return rows[0];
         });
         return results;
     }
 
     createDepartments(department) {
-        const sql = `INSERT INTO department (name) VALUES(?)`
+        const sql = `INSERT INTO department (name) VALUES(?)`;
         return this.db.promise().query(sql, department);
     }
     createEmployee(employee) {
-        const sql = `INSERT INTO employee SET ?`
-        return this.db.promise().query(sql, employee);
+        const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?,?,?,?)`;
+        const params = [employee.firstName, employee.lastName, employee.role, employee.manager];
+        return this.db.promise().query(sql, params);
     }
     createRole(role) {
-        const sql = `INSERT INTO role (title, salary, department_id) VALUES (?,?,?)`
+        const sql = `INSERT INTO role (title, salary, department_id) VALUES (?,?,?)`;
         const params = [role.roleName, role.salary, role.depts]
         return this.db.promise().query(sql, params);
     }
