@@ -196,7 +196,86 @@ const addEmployee = () => {
                 }).then(companyPrompts);
             })
         });
-    }    
+    }
+    
+    
+const updateEmployee = () => {
+    let rolesObj;
+    let employeesObj;
+    let rolesArr = [];
+    //get all roles
+    db.findAllRoles().then(data => {
+         rolesObj = data;
+        return data.map(role => {
+            return role.title
+        });
+    }).then(roles => {
+        //set roles array equal to array names
+     rolesArr = roles;
+     //find all employees and get first name array
+     db.findAllEmployees().then(data => {
+         employeesObj = data;
+         return data.map(employee => {
+             return employee.first_name
+         });
+     }).then(employeeNames => {
+                 return inquirer.prompt ([
+                     {
+                         type: 'list',
+                         name: 'firstName',
+                         message: 'What is the first name of the Employee you wish to update?',
+                         choices: employeeNames,
+                         validate: firstName => {
+                             if (firstName) {
+                                 return true;
+                             } else {
+                                 console.log('Enter a Name!');
+                                 return false;
+                             }
+                         }
+                     },
+                     {
+                        type: 'list',
+                        name: 'role',
+                        message: 'Which Role does this Employee belong to?',
+                        choices: rolesArr,
+                        validate: role => {
+                            if (role) {
+                                return true;
+                            } else {
+                                console.log('Enter a Role!');
+                                return false;
+                            }
+                        }
+                    }
+                    ]).then(employeeChoice => {
+                        console.log(employeeChoice);
+                        //get employee id from object
+                    let employeeId = employeesObj.filter(rows => {
+                        if (rows.first_name === employeeChoice.firstName) {
+                            return rows.id;
+                        }
+                    })
+                    //get role id from object
+                    let roleId = rolesObj.filter(rows => {
+                        if (rows.title === employeeChoice.role) {
+                            return rows.id;
+                        }
+                    })
+                    console.log(employeeId[0].id);
+                    console.log(roleId[0].id);
+                    //set employee choice values to db ids
+                    employeeChoice.firstName = employeeId[0].id;
+                    employeeChoice.role = roleId[0].id;
+                    //update values in employee role
+                    db.updateEmployeeRole(employeeChoice);
+
+                }).then(companyPrompts);
+
+
+            })
+        })  
+}
   
 
 
@@ -250,6 +329,11 @@ return inquirer.prompt ([
             break;
         case 'Add an Employee':
             addEmployee();
+            //console.table(db.findAllEmployees());
+            //companyPrompts();
+            break;
+        case 'Update an Employee Role':
+            updateEmployee();
             //console.table(db.findAllEmployees());
             //companyPrompts();
             break;

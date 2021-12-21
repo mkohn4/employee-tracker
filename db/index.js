@@ -26,15 +26,6 @@ class DB_INTERACT {
         });
         return results;
     }
-     /*getAllDepts() {
-        //running into promise and/or scoping issue with getting array of depts
-        const sql = `SELECT name FROM department`;
-        const results = this.db.promise().query(sql).then((rows) => {
-            return rows[0];
-        });
-        console.log(results);
-        return results;
-    }*/
     findAllRoles() {
         console.log('In all roles');
         const sql = `SELECT role.id, role.title, role.salary, department.name FROM role 
@@ -56,9 +47,15 @@ class DB_INTERACT {
     }
     createRole(role) {
         const sql = `INSERT INTO role (title, salary, department_id) VALUES (?,?,?)`;
-        const params = [role.roleName, role.salary, role.depts]
+        const params = [role.roleName, role.salary, role.depts];
         return this.db.promise().query(sql, params);
     }
+    updateEmployeeRole(employeeChoice) {
+        const sql = `UPDATE employee SET role_id=? WHERE id = ?`;
+        const params = [employeeChoice.role, employeeChoice.firstName];
+        return this.db.promise().query(sql, params);
+    }
+    
     //create function in this class for each db query/update/delete
     //call each query based on main menu of options from inquirer
         //unless CREATE or UPDATE
