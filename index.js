@@ -20,7 +20,7 @@ const addDepartment = () => {
     ]).then(department => {
         console.log(department.deptName);
         db.createDepartments(department.deptName);
-    });
+    }).then(companyPrompts);
 };
 
 const addRole = () => {
@@ -85,7 +85,7 @@ const addRole = () => {
             role.depts = a[0].id;
             console.log(role.roleName+ ' + '+ role.depts+ ' + '+ role.salary);
             db.createRole(role);
-        });
+        }).then(companyPrompts);
    })
     
 }
